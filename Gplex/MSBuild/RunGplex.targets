@@ -1,0 +1,36 @@
+<!-- RunCustomTool.targets -->
+<Project>
+  <PropertyGroup>
+    <_GplexTool>dotnet "$(MSBuildThisFileDirectory)/netcoreapp2.0/Gplex.dll"</_GplexTool>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <GplexFile>
+      <OutFile>%(Identity).cs</OutFile>
+      <CaseInsensitive>false</CaseInsensitive>
+      <Babel>false</Babel>
+    </GplexFile>
+  </ItemDefinitionGroup>
+
+  <Target Name="_ResolveGplexFiles">
+    <!-- Is this something? Run gplex on all *.lex files in project if no explicit GplexFile exist in csproj -->
+    <!--ItemGroup>
+      <GplexFile Condition=" '@(GplexFile)' == '' and '%(Extension)' == '.lex' " Include="@(Content);@(None)" />
+      <GplexFile Condition=" '@(GplexFile)' == '' " Include="**\*.lex" />
+    </ItemGroup-->
+  </Target>
+
+  <!-- TODO: https://stackoverflow.com/questions/50071932/how-do-i-call-my-script-before-all-the-builds-for-only-once-in-a-multi-targeting -->
+  <Target Name="GplexTool" BeforeTargets="CoreCompile" DependsOnTargets="PrepareForBuild;_ResolveGplexFiles" Inputs="@(GplexFile)" Outputs="@(GplexFile->'%(OutFile)')">
+    <ItemGroup>
+      <GplexFileToBuild Include="@(GplexFile)">
+        <OutFile>%(Outfile)</OutFile>
+        <CaseInsensitiveArg Condition="%(CaseInsensitive) == 'true'">/caseInsensitive </CaseInsensitiveArg>
+        <BabelArg Condition="%(Babel) == 'true'">/babel </BabelArg>
+      </GplexFileToBuild>
+    </ItemGroup>
+    <Message Text="Gplexing @(GplexFileToBuild->'%(Identity)')" Importance="high" />
+    <Exec Command="$(_GplexTool) %(GplexFileToBuild.CaseInsensitiveArg) %(GplexFileToBuild.BabelArg) /out:&quot;./%(GplexFileToBuild.Outfile)&quot; %(GplexFileToBuild.Identity)" />
+  </Target>
+
+</Project>

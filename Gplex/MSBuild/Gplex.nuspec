@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Gplex.Tool</id>
+    <version>0.0.2</version>
+    <authors>Gplex developers</authors>
+    <description>Gardens Point Scanner Generator (Gplex) for .NET Core projects</description>
+  </metadata>
+  <files>
+    <!-- Placeholders indicating host project compatibility. The tools can be used in any .NET Framework and .NET Standard projects -->
+    <file src="_._" target="lib/netstandard1.0/" />
+    <file src="_._" target="lib/net20/" />
+
+    <!-- Framework specific target that includes the real run target below -->
+    <file src="Gplex.targets" target="build/netstandard1.0/Gplex.Tool.targets" />
+    <file src="Gplex.targets" target="build/net20/Gplex.Tool.targets" />
+
+    <!-- The target that actually runs the custom tool -->
+    <file src="RunGplex.targets" target="tools" />
+    
+    <!-- The tool binaries. Note that the net20 binaries are included purely for distribution, they are not used by the build targets -->
+    <file src="$publishdir$\net20\**\*" target="tools/net20/" />
+    <file src="$publishdir$\netcoreapp2.0\**\*" target="tools/netcoreapp2.0/" />
+  </files>
+</package>

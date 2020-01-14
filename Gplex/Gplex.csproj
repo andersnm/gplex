@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net20;netcoreapp2.0</TargetFrameworks>
+    <AssemblyName>Gplex</AssemblyName>
+    <RootNamespace>QUT.Gplex</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
+  <!-- Pack settings -->
+  <PropertyGroup>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <NuspecFile>MSBuild/Gplex.nuspec</NuspecFile>
+    <IntermediatePackDir>$(MSBuildProjectDirectory)/bin/$(Configuration)/publish/</IntermediatePackDir>
+    <PublishDir>$(IntermediatePackDir)$(TargetFramework)/</PublishDir>
+    <NuspecProperties>publishDir=$([MSBuild]::NormalizeDirectory($(IntermediatePackDir)));configuration=$(Configuration)</NuspecProperties>
+  </PropertyGroup>
+
+  <!-- Executes /t:Publish for all target frameworks before packing-->
+  <Target Name="Nuget" AfterTargets="Build">
+    <ItemGroup>
+      <_TargetFramework Include="$(TargetFrameworks)" />
+    </ItemGroup>
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" Properties="TargetFramework=%(_TargetFramework.Identity)" />
+  </Target>
+
+  <ItemGroup>
+    <GplexFile Include="Gplex.lex">
+      <Outfile>Scanner.cs</Outfile>
+    </GplexFile>
+    <GppgFile Include="Gplex.y">
+      <Outfile>Parser.cs</Outfile>
+      <Gplex>true</Gplex>
+      <Nolines>true</Nolines>
+    </GppgFile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="IncludeResources\GplexBuffers.txt" />
+    <EmbeddedResource Include="IncludeResources\gplexx.frame" />
+    <EmbeddedResource Include="IncludeResources\ResourceHeader.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Gplex.Tool" Version="0.0.2" PrivateAssets="All" />
+    <PackageReference Include="Gppg.Tool" Version="0.0.2" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
